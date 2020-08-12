@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\News.core.IRepository\News.core.IRepository.csproj" />
+    <ProjectReference Include="..\News.core.IServices\News.core.IServices.csproj" />
+    <ProjectReference Include="..\News.core.Model\News.core.Model.csproj" />
+    <ProjectReference Include="..\News.core.Repository\News.core.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
