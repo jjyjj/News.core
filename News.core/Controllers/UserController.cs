@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,7 @@ namespace News.core.Controllers
 
 
         #region 根据Id获取用户信息
+        [Authorize]
         [HttpGet]
         public async Task<MessageModel> GetOneById(int userId)
         {
@@ -99,7 +101,7 @@ namespace News.core.Controllers
                     data.Msg = "添加成功";
                 }
                 else data.Msg = "添加失败";
-              
+
 
             }
             else
@@ -138,6 +140,7 @@ namespace News.core.Controllers
         #endregion
 
         #region 修改用户信息
+        [Authorize]
         [HttpPut]
         public async Task<MessageModel> Put([FromBody]  Users model)
         {
@@ -150,6 +153,13 @@ namespace News.core.Controllers
                 {
                     oldUser.Email = model.Email;
                     oldUser.PassWord = model.PassWord;
+                    oldUser.ImgUrl = model.ImgUrl;
+                    oldUser.Phone = model.Phone;
+                    oldUser.Sex = model.Sex;
+                    oldUser.Adress = model.Adress;
+                    oldUser.Birthday = model.Birthday;
+                    oldUser.Name = model.Name;
+                    oldUser.Level = model.Level;
                     var result = await _userService.Update(oldUser);
                     if (result)
                     {
@@ -166,9 +176,9 @@ namespace News.core.Controllers
         #region 生成验证码图片
         [HttpGet]
 
-        public IActionResult ValidateCode( )
+        public IActionResult ValidateCode()
         {
-            
+
             var info = _captcha.Generate("12");
             var stream = new MemoryStream(info.CaptchaByteData);
             return File(stream, "image/png");
@@ -177,7 +187,7 @@ namespace News.core.Controllers
 
         #region 验证
         [HttpGet]
-        public bool Validate( string code)
+        public bool Validate(string code)
         {
             var result = _captcha.Validate("12", code);
 
