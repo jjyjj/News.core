@@ -30,10 +30,10 @@ namespace News.core.Controllers
 
         #region 获取所有用户信息
         [HttpGet]
-        public MessageModel GetAll()
+        public async Task<MessageModel> GetAll()
         {
 
-            var data = _userService.GetAll().ToList();
+            var data = await _userService.GetAll();
             return new MessageModel()
             {
                 Code = 200,
@@ -42,11 +42,12 @@ namespace News.core.Controllers
             };
 
         }
+
         #endregion
 
 
         #region 根据Id获取用户信息
-        [Authorize]
+
         [HttpGet]
         public async Task<MessageModel> GetOneById(int userId)
         {
@@ -79,7 +80,7 @@ namespace News.core.Controllers
 
         #region 增加用户
         [HttpPost]
-        public async Task<MessageModel> Post([FromBody] UserViewModel userViewModel)
+        public async Task<MessageModel> Add([FromBody] UserViewModel userViewModel)
         {
             MessageModel data = new MessageModel();
             if (Validate(userViewModel.Code))
@@ -116,7 +117,7 @@ namespace News.core.Controllers
 
         #region 删除用户
         [HttpDelete]
-        public async Task<MessageModel> Delete(int id)
+        public async Task<MessageModel> Del(int id)
         {
             MessageModel data = new MessageModel();
             if (id < 0) data.Msg = "id不可为空";
@@ -142,7 +143,7 @@ namespace News.core.Controllers
         #region 修改用户信息
         [Authorize]
         [HttpPut]
-        public async Task<MessageModel> Put([FromBody]  Users model)
+        public async Task<MessageModel> Update([FromBody]  Users model)
         {
             MessageModel data = new MessageModel();
 
@@ -175,7 +176,6 @@ namespace News.core.Controllers
 
         #region 生成验证码图片
         [HttpGet]
-
         public IActionResult ValidateCode()
         {
 

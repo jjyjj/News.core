@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using News.core.IRepository;
+using News.core.Model;
 using News.core.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,11 +22,8 @@ namespace News.core.Repository
 
         public async Task<int> Create(T model)
         {
-
-            _db.Entry<T>(model).State = EntityState.Added;
-            //var data = _dbSet.Add(model);
-            //return await _db.SaveChangesAsync();
-            // var data = _db.Set<T>().Add(model);
+            _dbSet.Add(model);
+            //  _db.Entry<T>(model).State = EntityState.Added;
             return await _db.SaveChangesAsync();
 
 
@@ -37,22 +35,27 @@ namespace News.core.Repository
             return await _db.SaveChangesAsync() > 0;
         }
 
-        public IQueryable<T> GetAll()
-        {
 
-            return _dbSet.AsNoTracking();
+        public async Task<List<T>> GetAll()
+        {
+            return await _dbSet.OrderByDescending(s => s.CreateTime).AsNoTracking().ToListAsync();
         }
+
+       
 
         public async Task<T> GetOneById(int id)
         {
-            var s = await GetAll().FirstAsync(m => m.Id == id);
-            return s;
+
+            return await _dbSet.FindAsync(id); ;
         }
 
         public async Task<bool> Update(T model)
         {
-            _db.Entry(model).State = EntityState.Modified;
+            _dbSet.Update(model);
+
             return await _db.SaveChangesAsync() > 0;
         }
+      
+
     }
 }

@@ -79,14 +79,12 @@ namespace News.core.Controllers
 
 
         [HttpPost]
-        public MessageModel Login([FromBody] Users users)
+        public async Task<MessageModel> Login([FromBody] Users users)
         {
             MessageModel messageModel = new MessageModel();
-            var user = _userService.GetAll().FirstOrDefaultAsync(m => m.Email == users.Email && m.PassWord == users.PassWord);
-            user.Wait();
-            var Resultdata = user.Result;
-
-            if (Resultdata == null)
+            var userList = await _userService.GetAll();
+            var user = userList.Find(m => m.Name == users.Name && m.PassWord == users.PassWord);
+            if (user == null)
             {
                 messageModel.Msg = "邮箱或者密码错误";
 
@@ -94,7 +92,7 @@ namespace News.core.Controllers
             else
             {
                 messageModel.Code = 200;
-                messageModel.Data = CreateToken(Resultdata);
+                messageModel.Data = CreateToken(user);
                 messageModel.Msg = "登录成功";
             }
 

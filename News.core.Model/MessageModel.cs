@@ -7,7 +7,7 @@ namespace News.core.Model
     public class MessageModel
     {
         public int Code { get; set; } = 0;
-        public string Msg { get; set; }
+        public string Msg { get; set; } = "请求失败";
         public dynamic Data { get; set; }
     }
 }

@@ -123,12 +123,26 @@ namespace News.core
 
 
 
+
+
+            #region ·þÎñ×¢Èë
             services.AddDbContext<NewsDbContext>();
+
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<ICategoryRepostorycs, CategoryRepostorycs>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+            services.AddScoped<INewsToCategoryRepository, NewsToCategoryRepository>();
+            services.AddScoped<INewsToCategoryService, NewsToCategoryService>();
+
             services.AddScoped<INewsRepository, NewsRepository>();
             services.AddScoped<INewsService, NewsService>();
+
+
+            #endregion
+
 
 
             services.AddControllers();

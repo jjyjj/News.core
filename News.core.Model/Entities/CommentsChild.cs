@@ -7,7 +7,9 @@ namespace News.core.Model.Entities
     //评论子表
     public partial class CommentsChild : BaseEntity
     {
-      
+        public int? UserId { get; set; }
+        public int? NewsId { get; set; }
+        public int? CommentsId { get; set; }
         public string Content { get; set; }
 
         public virtual News News { get; set; }

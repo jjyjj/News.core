@@ -1,4 +1,5 @@
-﻿using News.core.Model.Entities;
+﻿using News.core.Model;
+using News.core.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,13 @@ namespace News.core.IRepository
 {
     public interface IBaseRepository<T> where T : BaseEntity, new()
     {
+
+
         Task<int> Create(T model);
         Task<bool> Delete(T model);
         Task<bool> Update(T model);
         Task<T> GetOneById(int id);
-        IQueryable<T> GetAll();
-
+        Task<List<T>> GetAll();
+      
     }
 }

@@ -30,10 +30,10 @@ namespace News.core.Controllers
         /// 获取token
         /// </summary>
         /// <param name="user"></param>
-        private object Token(app_mobile_user model)
+        private object Token(test model)
         {
             //测试自己创建的对象
-            var user = new app_mobile_user
+            var user = new test
             {
                 id = 1,
                 phone = "138000000",

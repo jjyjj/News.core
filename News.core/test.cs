@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace News.core
 {
-    public class app_mobile_user
+    public class test
     {
         public long id { get; set; }
         /// <summary>

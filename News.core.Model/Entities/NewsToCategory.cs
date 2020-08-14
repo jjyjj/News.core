@@ -9,7 +9,10 @@ namespace News.core.Model.Entities
     /// </summary>
     public partial class NewsToCategory : BaseEntity
     {
+        public int? NewsId { get; set; }
         public virtual News News { get; set; }
+        public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
+
     }
 }

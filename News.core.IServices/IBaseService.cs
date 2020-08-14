@@ -1,4 +1,5 @@
-﻿using News.core.Model.Entities;
+﻿using News.core.Model;
+using News.core.Model.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace News.core.IServices
         Task<bool> Delete(T model);
         Task<T> GetOneById(int id);
         Task<bool> Update(T model);
-        IQueryable<T> GetAll();
+        Task<List<T>> GetAll();
+      
     }
 }

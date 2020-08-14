@@ -1,5 +1,7 @@
-﻿using News.core.IRepository;
+﻿using Microsoft.EntityFrameworkCore;
+using News.core.IRepository;
 using News.core.IServices;
+using News.core.Model;
 using News.core.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace News.core.Services
 {
-    public class BaseService<T> : IBaseService<T> where T :  BaseEntity,  new()
+    public class BaseService<T> : IBaseService<T> where T : BaseEntity, new()
     {
         public IBaseRepository<T> BaseDal;
-       
+
 
         public async Task<int> Create(T model)
         {
@@ -24,11 +26,6 @@ namespace News.core.Services
             return await BaseDal.Delete(model);
         }
 
-        public IQueryable<T> GetAll()
-        {
-            return BaseDal.GetAll();
-        }
-
         public async Task<T> GetOneById(int id)
         {
             return await BaseDal.GetOneById(id);
@@ -38,5 +35,11 @@ namespace News.core.Services
         {
             return await BaseDal.Update(model);
         }
+        public async Task<List<T>> GetAll()
+        {
+            return await BaseDal.GetAll();
+        }
+       
+
     }
 }
