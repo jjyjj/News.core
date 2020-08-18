@@ -1,5 +1,6 @@
 ﻿using News.core.IRepository;
 using News.core.IServices;
+using News.core.Model;
 using News.core.Model.Entities;
 using News.core.Model.ViewModel;
 using System;
@@ -26,6 +27,27 @@ namespace News.core.Services
             base.BaseDal = newsRepository;
         }
 
+        public async Task<PageModel<Model.Entities.News>> GetAllByCategory(string categoryName)
+        {
+
+            //获取当前类别
+            var categoryList = await _categoryRepostorycs.GetAll();
+            var category = categoryList.Find(m => m.Name == categoryName);
+            //根据类别id 查新闻id集合
+            var newsToCategory = await _newsToCategoryRepository.GetAll();
+            var newsToCategoryList = newsToCategory.FindAll(m => m.CategoryId == category.Id);
+            List<Model.Entities.News> newsList = new List<Model.Entities.News>();
+            PageModel<Model.Entities.News> s = new PageModel<Model.Entities.News>();
+            foreach (var item in newsToCategoryList)
+            {
+                var news = await _newsRepository.GetOneById(item.NewsId.Value);
+                newsList.Add(news);
+            }
+            s.data = newsList;
+            s.dataCount = newsList.Count;
+           
+            return s;
+        }
 
         public async Task<Model.ViewModel.NewsDetailsModel> GetDetailsById(int newsId)
         {
@@ -75,7 +97,7 @@ namespace News.core.Services
                 }
 
             }
-
+          
             newsDetailsModel.News = news;
 
             return newsDetailsModel;

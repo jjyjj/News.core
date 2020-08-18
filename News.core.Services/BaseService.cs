@@ -18,7 +18,16 @@ namespace News.core.Services
 
         public async Task<int> Create(T model)
         {
-            return await BaseDal.Create(model);
+            var s = await BaseDal.Create(model) > 0;
+            if (s)
+            {
+                return model.Id;
+            }
+            else
+            {
+                return 0;
+            }
+
         }
 
         public async Task<bool> Delete(T model)
@@ -33,13 +42,18 @@ namespace News.core.Services
 
         public async Task<bool> Update(T model)
         {
+
             return await BaseDal.Update(model);
         }
         public async Task<List<T>> GetAll()
         {
             return await BaseDal.GetAll();
         }
-       
 
+
+        public async Task<PageModel<T>> GetAll(int pageIndex, int pageSize)
+        {
+            return await BaseDal.GetAll(pageIndex, pageSize);
+        }
     }
 }

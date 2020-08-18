@@ -30,16 +30,29 @@ namespace News.core.Controllers
 
         #region 获取所有用户信息
         [HttpGet]
-        public async Task<MessageModel> GetAll()
+        public async Task<MessageModel> GetAll(QueryModel queryModel)
         {
-
-            var data = await _userService.GetAll();
-            return new MessageModel()
+            MessageModel messageModel = new MessageModel();
+            try
             {
-                Code = 200,
-                Msg = "获取成功",
-                Data = data
-            };
+                if (queryModel.isPage)
+                {
+                    messageModel.Data = await _userService.GetAll(queryModel.pageIndex, queryModel.pageSize);
+                }
+                else
+                {
+                    messageModel.Data = await _userService.GetAll();
+                }
+                messageModel.Code = 200;
+                messageModel.Msg = "获取数据成功";
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            return messageModel;
 
         }
 
@@ -141,17 +154,18 @@ namespace News.core.Controllers
         #endregion
 
         #region 修改用户信息
-        [Authorize]
+
         [HttpPut]
         public async Task<MessageModel> Update([FromBody]  Users model)
         {
             MessageModel data = new MessageModel();
 
-            if (model != null && model.Id > 0)
+            if (model.Id > 0)
             {
                 var oldUser = await _userService.GetOneById(model.Id);
                 if (oldUser != null)
                 {
+                    #region MyRegion
                     oldUser.Email = model.Email;
                     oldUser.PassWord = model.PassWord;
                     oldUser.ImgUrl = model.ImgUrl;
@@ -161,6 +175,10 @@ namespace News.core.Controllers
                     oldUser.Birthday = model.Birthday;
                     oldUser.Name = model.Name;
                     oldUser.Level = model.Level;
+                    oldUser.IsRemove = model.IsRemove;
+                    oldUser.State = model.State;
+                    #endregion
+
                     var result = await _userService.Update(oldUser);
                     if (result)
                     {

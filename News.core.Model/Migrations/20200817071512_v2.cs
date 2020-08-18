@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace News.core.Model.Migrations
 {
-    public partial class jjy : Migration
+    public partial class v2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,8 +40,8 @@ namespace News.core.Model.Migrations
                     CreateTime = table.Column<DateTime>(nullable: true),
                     State = table.Column<int>(nullable: true),
                     IsRemove = table.Column<int>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    UserId = table.Column<int>(nullable: true)
+                    UserId = table.Column<int>(nullable: true),
+                    Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,8 +114,9 @@ namespace News.core.Model.Migrations
                     State = table.Column<int>(nullable: true),
                     IsRemove = table.Column<int>(nullable: true),
                     Content = table.Column<string>(nullable: true),
-                    UserId = table.Column<int>(nullable: true),
-                    NewsId = table.Column<int>(nullable: true)
+                    UserName = table.Column<string>(nullable: true),
+                    NewsId = table.Column<int>(nullable: true),
+                    UserId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -172,10 +173,11 @@ namespace News.core.Model.Migrations
                     CreateTime = table.Column<DateTime>(nullable: true),
                     State = table.Column<int>(nullable: true),
                     IsRemove = table.Column<int>(nullable: true),
-                    Content = table.Column<string>(nullable: true),
-                    NewsId = table.Column<int>(nullable: true),
                     UserId = table.Column<int>(nullable: true),
-                    CommentsId = table.Column<int>(nullable: true)
+                    NewsId = table.Column<int>(nullable: true),
+                    CommentsId = table.Column<int>(nullable: true),
+                    Content = table.Column<string>(nullable: true),
+                    UserName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

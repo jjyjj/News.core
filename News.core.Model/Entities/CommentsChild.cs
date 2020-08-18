@@ -11,7 +11,7 @@ namespace News.core.Model.Entities
         public int? NewsId { get; set; }
         public int? CommentsId { get; set; }
         public string Content { get; set; }
-
+        public string UserName { get; set; }
         public virtual News News { get; set; }
         public virtual Users User { get; set; }
         public virtual Comments Comments { get; set; }

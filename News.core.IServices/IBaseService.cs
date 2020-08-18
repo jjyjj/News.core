@@ -16,6 +16,8 @@ namespace News.core.IServices
         Task<T> GetOneById(int id);
         Task<bool> Update(T model);
         Task<List<T>> GetAll();
-      
+    
+        Task<PageModel<T>> GetAll(int pageIndex, int pageSize);
+
     }
 }

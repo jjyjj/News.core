@@ -14,7 +14,7 @@ namespace News.core.Model.Entities
         public string ImagePath { get; set; }
 
         public int? UserId { get; set; }
-        public int BrowseCOunt { get; set; }
+        public int BrowseCOunt { get; set; } = 0;
         public DateTime LastChangTime { get; set; }
 
         public virtual Users User { get; set; }

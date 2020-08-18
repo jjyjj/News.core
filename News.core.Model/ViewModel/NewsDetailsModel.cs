@@ -19,6 +19,7 @@ namespace News.core.Model.ViewModel
         //public int UserId { get; set; }//创建人Id
         //public string UserName { get; set; }//创建人Name
         public Model.Entities.News News { get; set; }
+    
         public List<string> Categories { get; set; } = new List<String>();//类别
         public string previous { get; set; }//上一篇
 

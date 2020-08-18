@@ -17,6 +17,9 @@ namespace News.core.IRepository
         Task<bool> Update(T model);
         Task<T> GetOneById(int id);
         Task<List<T>> GetAll();
-      
+     
+    
+        Task<PageModel<T>> GetAll(int pageIndex, int pageSize);
+
     }
 }

@@ -140,7 +140,13 @@ namespace News.core
             services.AddScoped<INewsRepository, NewsRepository>();
             services.AddScoped<INewsService, NewsService>();
 
+            services.AddScoped<ICommentRepostory, CommentRepository>();
+            services.AddScoped<ICommentService, CommentService>();
 
+            services.AddScoped<ICommentChildRepository, CommentChildRepository>();
+            services.AddScoped<ICommentChildService, CommentChildService>();
+
+          
             #endregion
 
 

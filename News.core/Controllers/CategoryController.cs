@@ -47,26 +47,30 @@ namespace News.core.Controllers
 
         #region 增加 类别
         [HttpPost]
-        public async Task<MessageModel> Add(Category category, int userId)
+        public async Task<MessageModel> Add(string categoryName, int userId)
         {
             MessageModel messageModel = new MessageModel();
             try
             {
-                var data = await _categoryService.GetAll();
 
+                var categoryData = (await _categoryService.GetAll()).Find(m => m.Name == categoryName);
 
-                if (data.Exists(m => m.Name == category.Name))
+                if (categoryData == null)
                 {
-                    category.User.Id = userId;
+                    Category category = new Category();
+                    category.Name = categoryName;
+                    category.UserId = userId;
                     var result = await _categoryService.Create(category) > 0;
-                    if (result)
-                    {
-                        messageModel.Code = 200;
-                        messageModel.Msg = "创建类别成功";
-                    }
+                    if (result) messageModel.Msg = "创建类别成功";
+                    else messageModel.Msg = "创建类别失败";
+
+
+
+
                 }
+                else messageModel.Msg = "已存在该类别";
+
                 messageModel.Code = 200;
-                messageModel.Msg = "已存在该类别";
             }
             catch (Exception)
             {
@@ -84,24 +88,19 @@ namespace News.core.Controllers
             MessageModel messageModel = new MessageModel();
             try
             {
-                //获取到的同样是本表的数据 没有外键数据，说明需要进行关联查询
-                var data = await _newsToCategoryService.GetAll();
-                data = data.FindAll(m => m.Category.Id == CategoryId);
-
-                if (data.Count <= 0)//没有新闻关联,进行删除
-                {
-                    var result = await _categoryService.Delete(new Category() { Id = CategoryId });
-                    if (result)
-                    {
-                        messageModel.Code = 200;
-                        messageModel.Msg = "删除成功";
-                    }
-                }
+                var categoryDate = await _categoryService.GetOneById(CategoryId);
+                if (categoryDate == null) messageModel.Msg = "该类别不存在";
                 else
                 {
-                    messageModel.Msg = "无法删除，请检查该类别下是否还有其他新闻";
+                    var newsToCategoryData = await _newsToCategoryService.GetOneById(CategoryId);
+                    if (newsToCategoryData != null) messageModel.Msg = "无法删除，请检查该类别下是否还有其他新闻";
+                    else
+                    {
+                        var isDel = await _categoryService.Delete(categoryDate);
+                        if (isDel) messageModel.Msg = "删除成功";
+                    }
                 }
-
+                messageModel.Code = 200;
             }
             catch (Exception)
             {
@@ -121,26 +120,18 @@ namespace News.core.Controllers
             {
                 var data = await _categoryService.GetOneById(categoryId);
 
-                if (data != null)
+                if (data == null) messageModel.Msg = "类别不存在";
+                else
                 {
                     data.Name = categoryName;
                     var result = await _categoryService.Update(data);
-                    if (result)
-                    {
-                        messageModel.Code = 200;
-                        messageModel.Msg = "修改类别成功";
-                    }
+                    if (result) messageModel.Msg = "修改类别成功";
                 }
-                else
-                {
-                    messageModel.Msg = "类别不存在";
-                }
-
+                messageModel.Code = 200;
             }
             catch (Exception)
             {
-
-
+                throw;
             }
             return messageModel;
         }

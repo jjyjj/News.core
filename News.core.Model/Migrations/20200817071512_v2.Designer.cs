@@ -10,8 +10,8 @@ using News.core.Model.Entities;
 namespace News.core.Model.Migrations
 {
     [DbContext(typeof(NewsDbContext))]
-    [Migration("20200813054247_jjy")]
-    partial class jjy
+    [Migration("20200817071512_v2")]
+    partial class v2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,6 +75,9 @@ namespace News.core.Model.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NewsId");
@@ -111,6 +114,9 @@ namespace News.core.Model.Migrations
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
