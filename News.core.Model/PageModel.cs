@@ -7,7 +7,7 @@ namespace News.core.Model
     /// <summary>
     /// 分页信息类
     /// </summary>
-    public class PageModel<T> 
+    public class PageModel<T>
     {
         /// <summary>
         /// 当前页标
@@ -16,7 +16,7 @@ namespace News.core.Model
         /// <summary>
         /// 总页数
         /// </summary>
-        public int pageCount { get; set; }
+        public int pageCount { get; set; } = 4;
         /// <summary>
         /// 数据总数
         /// </summary>
@@ -24,14 +24,14 @@ namespace News.core.Model
         /// <summary>
         /// 每页大小
         /// </summary>
-        public int pageSize { set; get; } = 1;
+        public int pageSize { set; get; } = 4;
         /// <summary>
         /// 返回数据
         /// </summary>
-        public List<T> data { get; set; }
+        public List<T> data { get; set; } = null;
 
 
 
-       
+
     }
 }

@@ -9,6 +9,8 @@ namespace News.core.IServices
 
     public interface ICommentService : IBaseService<Model.Entities.Comments>
     {
-        Task<List<Model.ViewModel.CommentViewModel>> GetAll(int newsId);
+        Task<PageModel<Model.ViewModel.CommentViewModel>> GetAll(int newsId, QueryModel queryModel);
+        Task<bool> DelAllComment(int commentId);
+        Task<PageModel<Model.ViewModel.CommentViewModel>> GetAllByUserId(int userId, QueryModel queryModel);
     }
 }

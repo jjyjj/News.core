@@ -20,7 +20,7 @@ namespace News.core.Model.ViewModel
         //public string UserName { get; set; }//创建人Name
         public Model.Entities.News News { get; set; }
     
-        public List<string> Categories { get; set; } = new List<String>();//类别
+        public List<Model.Entities.Category> Categories { get; set; } = new List<Category>();//类别
         public string previous { get; set; }//上一篇
 
 

@@ -2,6 +2,7 @@
 using News.core.IServices;
 using News.core.Model;
 using News.core.Model.Entities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,28 +28,28 @@ namespace News.core.Controllers
 
 
         [HttpPost]
-        public async Task<MessageModel> Add(int newsId, int userId, string userName, string content)
+        public async Task<MessageModel> Add([FromBody]  Comments comments)
         {
             MessageModel messageModel = new MessageModel();
-            Model.Entities.Comments comments = new Model.Entities.Comments();
 
-            comments.Content = content;
-            comments.NewsId = newsId;
-            comments.UserId = userId;
-            comments.UserName = userName;
-            try
+
+            if (comments.UserId > 0 && comments.NewsId > 0)
             {
-                var isCreate = await _commentService.Create(comments) > 0;
-                if (isCreate)
+                try
                 {
-                    messageModel.Code = 200;
-                    messageModel.Msg = "添加评论成功";
-                }
-            }
-            catch (Exception)
-            {
+                    var isCreate = await _commentService.Create(comments) > 0;
 
-                throw;
+                    if (isCreate)
+                    {
+                        messageModel.Code = 200;
+                        messageModel.Msg = "添加评论成功";
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
             return messageModel;
 
@@ -59,13 +60,13 @@ namespace News.core.Controllers
 
         #region 查询评论
         [HttpGet]
-        public async Task<MessageModel> GetAll(int newsId)
+        public async Task<MessageModel> GetAll(int newsId, QueryModel queryModel)
         {
             MessageModel messageModel = new MessageModel();
             try
             {
 
-                messageModel.Data = await _commentService.GetAll(newsId);
+                messageModel.Data = await _commentService.GetAll(newsId, queryModel);
                 messageModel.Code = 200;
                 messageModel.Msg = "success";
             }
@@ -79,6 +80,43 @@ namespace News.core.Controllers
         }
         #endregion
 
+        #region 删除评论
+        [HttpDelete]
+        public async Task<MessageModel> Del(int commentId)
+        {
+            MessageModel messageModel = new MessageModel();
+            if (commentId > 0)
+            {
+                if (await _commentService.DelAllComment(commentId))
+                {
+                    messageModel.Msg = "删除成功";
+                }
+                messageModel.Msg = "删除失败";
+            }
+            messageModel.Msg = "评论不存在";
+            messageModel.Code = 200;
+            return messageModel;
+        }
+        #endregion
 
+        [HttpGet]
+        public async Task<MessageModel> GetAllByUserId(int userId, QueryModel queryModel)
+        {
+            MessageModel messageModel = new MessageModel();
+            try
+            {
+
+                messageModel.Data = await _commentService.GetAllByUserId(userId, queryModel);
+                messageModel.Code = 200;
+                messageModel.Msg = "success";
+            }
+
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return messageModel;
+        }
     }
 }

@@ -156,6 +156,35 @@ namespace News.core.Model.Migrations
                     b.ToTable("Focus");
                 });
 
+            modelBuilder.Entity("News.core.Model.Entities.Imgs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("CreateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("IsRemove")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("State")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Imgs");
+                });
+
             modelBuilder.Entity("News.core.Model.Entities.News", b =>
                 {
                     b.Property<int>("Id")
@@ -310,6 +339,15 @@ namespace News.core.Model.Migrations
                 });
 
             modelBuilder.Entity("News.core.Model.Entities.Focus", b =>
+                {
+                    b.HasOne("News.core.Model.Entities.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("News.core.Model.Entities.Imgs", b =>
                 {
                     b.HasOne("News.core.Model.Entities.Users", "User")
                         .WithMany()

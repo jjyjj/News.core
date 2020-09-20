@@ -20,8 +20,9 @@ namespace News.core.Model.Entities
 
         public virtual DbSet<Focus> Focus { get; set; }
         public virtual DbSet<Category> Category { get; set; }
+
         public virtual DbSet<NewsToCategory> NewsToCategory { get; set; }
-      
+        public virtual DbSet<Imgs> Imgs { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

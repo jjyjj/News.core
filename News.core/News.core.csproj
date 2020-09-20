@@ -29,5 +29,10 @@
     <ProjectReference Include="..\News.core.Services\News.core.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Files\" />
+    <Folder Include="wwwroot\Files\Pictures\" />
+  </ItemGroup>
+
 
 </Project>

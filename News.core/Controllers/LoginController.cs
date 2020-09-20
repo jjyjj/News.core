@@ -45,7 +45,8 @@ namespace News.core.Controllers
                 Subject = new ClaimsIdentity(new Claim[] {
                     new Claim(JwtClaimTypes.Audience,_jwtSettings.Audience),
                     new Claim(JwtClaimTypes.Issuer,_jwtSettings.Issuer),
-                    new Claim(JwtClaimTypes.Name, users.Email.ToString()),
+                    new Claim(JwtClaimTypes.Email, users.Email.ToString()),
+                      new Claim(JwtClaimTypes.Name, users.Name.ToString()),
                     new Claim(JwtClaimTypes.Id, users.Id.ToString()),
                     new Claim(JwtClaimTypes.PhoneNumber, users.PassWord.ToString())
                 }),
@@ -65,6 +66,7 @@ namespace News.core.Controllers
                     id = users.Id,
                     email = users.Email,
                     passWord = users.PassWord,
+                    name = users.Name,
                     auth_time = authTime,
                     expires_at = expiresAt
                 }
@@ -82,9 +84,9 @@ namespace News.core.Controllers
         public async Task<MessageModel> Login([FromBody] Users users)
         {
             MessageModel messageModel = new MessageModel();
-            var userList = await _userService.GetAll();
-            var user = userList.Find(m => m.Name == users.Name && m.PassWord == users.PassWord);
-            if (user == null)
+
+            var userData = await _userService.GetOneByStr(m => m.Email == users.Email && m.PassWord == users.PassWord);
+            if (userData == null)
             {
                 messageModel.Msg = "邮箱或者密码错误";
 
@@ -92,7 +94,7 @@ namespace News.core.Controllers
             else
             {
                 messageModel.Code = 200;
-                messageModel.Data = CreateToken(user);
+                messageModel.Data = CreateToken(userData);
                 messageModel.Msg = "登录成功";
             }
 

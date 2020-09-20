@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -35,13 +36,10 @@ namespace News.core.Controllers
             MessageModel messageModel = new MessageModel();
             try
             {
-                if (queryModel.isPage)
-                {
-                    messageModel.Data = await _userService.GetAll(queryModel.pageIndex, queryModel.pageSize);
-                }
+                if (!queryModel.isPage) messageModel.Data = await _userService.Query();
                 else
                 {
-                    messageModel.Data = await _userService.GetAll();
+                    messageModel.Data = await _userService.Pagination<Users, object>(queryModel.pageIndex, queryModel.pageSize, n => n.CreateTime, null, queryModel.isDesc);
                 }
                 messageModel.Code = 200;
                 messageModel.Msg = "获取数据成功";
@@ -67,17 +65,14 @@ namespace News.core.Controllers
             var data = new MessageModel();
             try
             {
-
                 var users = await _userService.GetOneById(userId);
                 if (users == null) data.Msg = "查无此人";
-
                 else
                 {
                     data.Code = 200;
                     data.Msg = "获取成功";
                     data.Data = users;
                 }
-
             }
             catch (Exception)
             {
@@ -178,6 +173,7 @@ namespace News.core.Controllers
                     oldUser.IsRemove = model.IsRemove;
                     oldUser.State = model.State;
                     #endregion
+
 
                     var result = await _userService.Update(oldUser);
                     if (result)

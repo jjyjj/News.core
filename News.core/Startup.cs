@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -146,7 +148,11 @@ namespace News.core
             services.AddScoped<ICommentChildRepository, CommentChildRepository>();
             services.AddScoped<ICommentChildService, CommentChildService>();
 
-          
+            services.AddScoped<IFocusRepository, FocusRepository>();
+            services.AddScoped<IFocusService, FocusService>();
+
+            services.AddScoped<IImgsRepository, ImgsRepository>();
+            services.AddScoped<IImgsService, ImgsService>();
             #endregion
 
 
@@ -161,17 +167,22 @@ namespace News.core
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseAuthentication();
-            app.UseRouting();
+
             app.UseSwagger();
-            app.UseCors();
-
-
             app.UseSwaggerUI(m =>
             {
                 m.SwaggerEndpoint("/swagger/v1/swagger.json", "My api v1");
 
             });
+
+            //¾²Ì¬×ÊÔ´
+            app.UseStaticFiles(); //wwwrootÄ¿Â¼
+            app.UseAuthentication();
+            app.UseRouting();
+
+            //¿çÓò
+            app.UseCors();
+
 
 
 

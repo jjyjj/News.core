@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using News.core.IRepository;
 using News.core.Model;
 using News.core.Model.Entities;
@@ -84,10 +85,56 @@ namespace News.core.Repository
 
         public async Task<bool> Update(T model)
         {
+            //_db.Attach(model);
+            //_db.Entry(model).State = EntityState.Modified;
             _dbSet.Update(model);
             return await _db.SaveChangesAsync() > 0;
         }
 
+        /// <summary>
+        /// 获取数据列表
+        /// </summary>
+        /// <param name="strWhere">默认条件为空</param>
+        /// <returns></returns>
+        public async Task<List<T>> Query(Expression<Func<T, bool>> strWhere = null)
+        {
+            var data = _dbSet.OrderByDescending(s => s.CreateTime).AsNoTracking();
+            return strWhere == null ? await data.ToListAsync() : await data.Where(strWhere).ToListAsync();
 
+        }
+
+        public async Task<PageModel<T>> Pagination<TEntity, TKey>(int PageIndex, int PageSize, Expression<Func<T, TKey>> OrderBy, Expression<Func<T, bool>> WhereLambda = null, bool isDesc = true)
+        {
+            IQueryable<T> QueryList = isDesc == true ? _dbSet.OrderByDescending(OrderBy) : _dbSet.OrderBy(OrderBy);
+
+            if (WhereLambda != null)
+            {
+                QueryList = QueryList.Where(WhereLambda);
+            }
+            int totalCount = QueryList.Count();
+            int pageCount = (int)Math.Ceiling(totalCount / (double)PageSize);
+            var data = await QueryList.Skip(PageSize * (PageIndex - 1)).Take(PageSize).ToListAsync() ?? null;
+            return new Model.PageModel<T>()
+            {
+                data = data,
+                pageIndex = PageIndex,
+                pageSize = PageSize,
+                dataCount = totalCount,
+                pageCount = pageCount
+            };
+        }
+
+        public async Task<T> GetOneByStr(Expression<Func<T, bool>> strWhere)
+        {
+            return await _dbSet.Where(strWhere).FirstOrDefaultAsync(); ;
+        }
+
+        public void RollBack()
+        {
+            using (var tran = _db.Database.BeginTransaction())
+            {
+                tran.Rollback();
+            }
+        }
     }
 }

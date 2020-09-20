@@ -27,21 +27,12 @@ namespace News.core.Controllers
         [HttpGet]
         public async Task<MessageModel> getAll()
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            return new MessageModel()
             {
-                var data = await _categoryService.GetAll();
-                messageModel.Code = 200;
-                messageModel.Data = data;
-                messageModel.Msg = "获取成功";
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return messageModel;
+                Code = 200,
+                Data = await _categoryService.GetAll(),
+                Msg = "请求成功"
+            };
         }
         #endregion
 
@@ -49,35 +40,13 @@ namespace News.core.Controllers
         [HttpPost]
         public async Task<MessageModel> Add(string categoryName, int userId)
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            var addId = await _categoryService.Add(categoryName, userId);
+            return new MessageModel()
             {
-
-                var categoryData = (await _categoryService.GetAll()).Find(m => m.Name == categoryName);
-
-                if (categoryData == null)
-                {
-                    Category category = new Category();
-                    category.Name = categoryName;
-                    category.UserId = userId;
-                    var result = await _categoryService.Create(category) > 0;
-                    if (result) messageModel.Msg = "创建类别成功";
-                    else messageModel.Msg = "创建类别失败";
-
-
-
-
-                }
-                else messageModel.Msg = "已存在该类别";
-
-                messageModel.Code = 200;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return messageModel;
+                Code = 200,
+                Data = addId,
+                Msg = addId > 0 ? "创建成功" : "创建失败"
+            };
         }
         #endregion
 
@@ -85,29 +54,13 @@ namespace News.core.Controllers
         [HttpDelete]
         public async Task<MessageModel> Del(int CategoryId)
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            var isDel = await _categoryService.Del(CategoryId);
+            return new MessageModel()
             {
-                var categoryDate = await _categoryService.GetOneById(CategoryId);
-                if (categoryDate == null) messageModel.Msg = "该类别不存在";
-                else
-                {
-                    var newsToCategoryData = await _newsToCategoryService.GetOneById(CategoryId);
-                    if (newsToCategoryData != null) messageModel.Msg = "无法删除，请检查该类别下是否还有其他新闻";
-                    else
-                    {
-                        var isDel = await _categoryService.Delete(categoryDate);
-                        if (isDel) messageModel.Msg = "删除成功";
-                    }
-                }
-                messageModel.Code = 200;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return messageModel;
+                Code = 200,
+                Data = isDel,
+                Msg = isDel ? "删除成功" : "删除失败"
+            };
         }
         #endregion
 
@@ -115,25 +68,13 @@ namespace News.core.Controllers
         [HttpPut]
         public async Task<MessageModel> Update(int categoryId, string categoryName)
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            var isUpdata = await _categoryService.Update(categoryId, categoryName);
+            return new MessageModel()
             {
-                var data = await _categoryService.GetOneById(categoryId);
-
-                if (data == null) messageModel.Msg = "类别不存在";
-                else
-                {
-                    data.Name = categoryName;
-                    var result = await _categoryService.Update(data);
-                    if (result) messageModel.Msg = "修改类别成功";
-                }
-                messageModel.Code = 200;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return messageModel;
+                Code = 200,
+                Data = isUpdata,
+                Msg = isUpdata ? "更新成功" : "更新失败"
+            };
         }
         #endregion
     }
