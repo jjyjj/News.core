@@ -12,34 +12,23 @@ namespace News.core.Controllers
     public class CommentChildController : BaseController
     {
         private readonly ICommentChildService _commentChildService;
-        private readonly ICommentService _commentService;
-        private readonly INewsService _newsService;
-        private readonly IUserService _userService;
 
-        public CommentChildController(ICommentChildService commentChildService, ICommentService commentService, INewsService newsService, IUserService userService)
+        public CommentChildController(ICommentChildService commentChildService)
         {
             _commentChildService = commentChildService ?? throw new ArgumentNullException(nameof(commentChildService));
-            _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
-            _newsService = newsService ?? throw new ArgumentNullException(nameof(newsService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+
         }
         #region 添加子评论
         [HttpPost]
         public async Task<MessageModel> add([FromBody] CommentsChild commentsChild)
         {
-            MessageModel messageModel = new MessageModel();
-
-            if (commentsChild.UserId == null || commentsChild.NewsId == null || commentsChild.Content == null) messageModel.Msg = "添加评论失败";
-            else
+            var id = await _commentChildService.Add(commentsChild);
+            return new MessageModel()
             {
-                var isCreat = await _commentChildService.Create(commentsChild) > 0;
-                if (isCreat)
-                {
-                    messageModel.Msg = "评论成功";
-                }
-            }
-            messageModel.Code = 200;
-            return messageModel;
+                Code = 200,
+                Data = id,
+                Msg = id > 0 ? "创建成功" : "创建失败"
+            };
         }
         #endregion
 
@@ -47,16 +36,14 @@ namespace News.core.Controllers
         [HttpDelete]
         public async Task<MessageModel> Del(int commentChildId)
         {
-            MessageModel messageModel = new MessageModel();
-            if (commentChildId > 0)
+            var isDel = await _commentChildService.Del(commentChildId);
+            return new MessageModel()
             {
-                var isDel = await _commentChildService.Delete(new CommentsChild() { Id = commentChildId });
-                if (isDel) messageModel.Msg = "删除成功";
-                else messageModel.Msg = "删除失败";
+                Code = 200,
+                Data = isDel,
+                Msg = isDel ? "删除成功" : "删除失败"
+            };
 
-                messageModel.Code = 200;
-            }
-            return messageModel;
         }
         #endregion
 
