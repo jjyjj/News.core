@@ -13,15 +13,9 @@ namespace News.core.Controllers
     public class CategoryController : BaseController
     {
         private readonly ICategoryService _categoryService;
-
-
-        private readonly INewsToCategoryService _newsToCategoryService;
-
-        public CategoryController(ICategoryService categoryService, IUserService userService, INewsService newsService, INewsToCategoryService newsToCategoryService)
+        public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
-
-            _newsToCategoryService = newsToCategoryService ?? throw new ArgumentNullException(nameof(newsToCategoryService));
         }
         #region 获取所有类别
         [HttpGet]
