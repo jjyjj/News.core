@@ -11,7 +11,7 @@ namespace News.core.IServices
     {
         Task<int> Add(string categoryName, int userId);
         Task<bool> Del(int CategoryId);
-        Task<bool> Update(int categoryId, string categoryName)
+        Task<bool> Update(int categoryId, string categoryName);
     }
 
 }
