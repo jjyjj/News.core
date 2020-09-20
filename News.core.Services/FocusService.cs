@@ -24,13 +24,36 @@ namespace News.core.Services
             base.BaseDal = focusRepository;
         }
 
-        public async Task<PageModel<Model.ViewModel.FocusViewModel>> GetAllById(int userId, QueryModel queryModel, bool type)
+        public async Task<int> Add(int userId, int focusId)
+        {
+            if (userId <= 0 || focusId <= 0) return -1;
+            else
+            {
+                var focu = await _focusRepository.GetOneByStr(m => m.UserId == userId && m.FocusId == focusId);
+                if (focu != null) return -1;
+                return await _focusRepository.Create(
+                  new Focus()
+                  {
+                      UserId = userId,
+                      FocusId = focusId
+                  }
+                  );
+            }
+        }
+
+        public async Task<bool> Del(int focusId)
+        {
+            var model = await _focusRepository.GetOneByStr(m => m.Id == focusId);
+
+            return await _focusRepository.Delete(model);
+        }
+
+        public async Task<PageModel<Model.ViewModel.FocusViewModel>> GetAllByUserId(int userId, QueryModel queryModel, bool type)
         {
             List<Model.Entities.Focus> focusIdList = new List<Focus>();
-
             List<Model.ViewModel.FocusViewModel> focusViewModels = new List<Model.ViewModel.FocusViewModel>();
-
-            if (type)//查询我的粉丝
+            #region 查询我的粉丝
+            if (type)
             {
                 focusIdList = await _focusRepository.Query(m => m.UserId == userId);
                 foreach (var item in focusIdList)
@@ -41,9 +64,11 @@ namespace News.core.Services
                     focusViewModel.Users = data;
                     focusViewModels.Add(focusViewModel);
                 }
-
             }
-            else//我被谁关注了
+            #endregion
+
+            #region 我被谁关注了
+            else
             {
                 focusIdList = await _focusRepository.Query(m => m.FocusId == userId);
                 foreach (var item in focusIdList)
@@ -55,7 +80,9 @@ namespace News.core.Services
                     focusViewModels.Add(focusViewModel);
                 }
             }
+            #endregion
 
+            #region 分页
             PageModel<Model.ViewModel.FocusViewModel> pageModel = new PageModel<FocusViewModel>();
             pageModel.dataCount = focusIdList.Count;
             pageModel.pageCount = (int)Math.Ceiling(pageModel.dataCount / (double)queryModel.pageSize);
@@ -66,6 +93,8 @@ namespace News.core.Services
                 .Skip((pageModel.pageIndex - 1) * pageModel.pageSize)
                 .Take(pageModel.pageSize)
                 .ToList() ?? null;
+            #endregion
+
             return pageModel;
         }
     }

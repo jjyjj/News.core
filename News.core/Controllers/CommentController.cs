@@ -17,7 +17,7 @@ namespace News.core.Controllers
         public CommentController(ICommentService commentService, INewsService newsService, IUserService userService, ICommentChildService commentChildService)
         {
             _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
-
+            
         }
         #region 添加评论
         [HttpPost]

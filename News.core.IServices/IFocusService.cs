@@ -1,4 +1,5 @@
 ﻿using News.core.Model;
+using News.core.Model.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,12 @@ namespace News.core.IServices
         /// <param name="queryModel">查询参数</param>
         /// <param name="type">true是查询我的粉丝,false查询谁关注了我</param>
         /// <returns></returns>
-        Task<PageModel<Model.ViewModel.FocusViewModel>> GetAllById(int userId, QueryModel queryModel, bool type);
+        Task<PageModel<FocusViewModel>> GetAllByUserId(int userId, QueryModel queryModel, bool type);
+
+
+        #region 
+        Task<int> Add(int userId, int focusId);
+        Task<bool> Del(int focusId);
+        #endregion
     }
 }

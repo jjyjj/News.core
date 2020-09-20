@@ -20,57 +20,36 @@ namespace News.core.Controllers
     public class FocusController : BaseController
     {
         private readonly IFocusService _focusService;
-        private readonly IUserService _userService;
 
         public FocusController(IFocusService focusService, IUserService userService)
         {
             _focusService = focusService ?? throw new ArgumentNullException(nameof(focusService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
         #region 添加粉丝
         [HttpPost]
         public async Task<MessageModel> Add(int userId, int focusId)
         {
-            MessageModel messageModel = new MessageModel();
-            if (userId <= 0 || focusId <= 0) messageModel.Msg = "关注失败";
-            else
+            var id = await _focusService.Add(userId, focusId);
+            return new MessageModel()
             {
-                var isExit = await _focusService.GetOneByStr(m => m.UserId == userId && m.FocusId == focusId);
-                if (isExit != null)
-                {
-                    messageModel.Msg = "请勿重复关注";
-                }
-                else
-                {
-                    var isCreate = await _focusService.Create(
-                    new Focus()
-                    {
-                        UserId = userId,
-                        FocusId = focusId
-                    }
-                    ) > 0;
-                    messageModel.Msg = isCreate == true ? "关注成功" : "关注失败";
-                }
-
-            }
-            messageModel.Code = 200;
-
-            return messageModel;
+                Code = 200,
+                Data = id,
+                Msg = id > 0 ? "创建成功" : "创建失败"
+            };
         }
         #endregion
-        #region 查询粉丝/被关注 列表
+
+        #region 查询当前用户的粉丝列表或者关注人列表
         [HttpGet]
         public async Task<MessageModel> GetAllById(int userId, QueryModel queryModel, bool type)
         {
-            MessageModel messageModel = new MessageModel();
-            if (userId <= 0) messageModel.Msg = "用户不存在，无法进行查询";
-            else
+            var list = await _focusService.GetAllByUserId(userId, queryModel, type);
+            return new MessageModel()
             {
-                var focusList = await _focusService.GetAllById(userId, queryModel, type);
-                messageModel.Data = focusList;
-            }
-            messageModel.Code = 200;
-            return messageModel;
+                Code = 200,
+                Data = list,
+                Msg = list == null ? "获取失败" : "获取成功"
+            };
         }
         #endregion
 
@@ -78,16 +57,13 @@ namespace News.core.Controllers
         [HttpDelete]
         public async Task<MessageModel> Del(int focusId)
         {
-            MessageModel messageModel = new MessageModel();
-            if (focusId > 0)
+            var isDel = await _focusService.Del(focusId);
+            return new MessageModel()
             {
-                var focusData = await _focusService.GetOneById(focusId);
-                if (focusData == null) messageModel.Msg = "不存在该记录";
-                else messageModel.Msg = await _focusService.Delete(focusData) == true ? "删除成功" : "删除失败";
-
-            }
-            messageModel.Code = 200;
-            return messageModel;
+                Code = 200,
+                Data = isDel,
+                Msg = isDel ? "删除成功" : "删除失败"
+            };
         }
         #endregion
     }
