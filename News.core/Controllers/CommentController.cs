@@ -13,110 +13,74 @@ namespace News.core.Controllers
     public class CommentController : BaseController
     {
         private readonly ICommentService _commentService;
-        private readonly INewsService _newsService;
-        private readonly IUserService _userService;
-        private readonly ICommentChildService _commentChildService;
 
         public CommentController(ICommentService commentService, INewsService newsService, IUserService userService, ICommentChildService commentChildService)
         {
             _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
-            _newsService = newsService ?? throw new ArgumentNullException(nameof(newsService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _commentChildService = commentChildService ?? throw new ArgumentNullException(nameof(commentChildService));
+
         }
         #region 添加评论
-
-
         [HttpPost]
         public async Task<MessageModel> Add([FromBody]  Comments comments)
         {
-            MessageModel messageModel = new MessageModel();
-
-
-            if (comments.UserId > 0 && comments.NewsId > 0)
+            var id = await _commentService.Add(comments);
+            return new MessageModel()
             {
-                try
-                {
-                    var isCreate = await _commentService.Create(comments) > 0;
-
-                    if (isCreate)
-                    {
-                        messageModel.Code = 200;
-                        messageModel.Msg = "添加评论成功";
-                    }
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-            }
-            return messageModel;
+                Code = 200,
+                Data = id,
+                Msg = id > 0 ? "创建成功" : "创建失败"
+            };
 
 
 
         }
         #endregion
 
-        #region 查询评论
+        #region 查询所有评论
         [HttpGet]
         public async Task<MessageModel> GetAll(int newsId, QueryModel queryModel)
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            var list = await _commentService.GetAll(newsId, queryModel);
+
+            return new MessageModel()
             {
+                Code = 200,
+                Data = list,
+                Msg = list == null ? "暂无数据" : "获取成功"
+            };
+        }
 
-                messageModel.Data = await _commentService.GetAll(newsId, queryModel);
-                messageModel.Code = 200;
-                messageModel.Msg = "success";
-            }
 
-            catch (Exception)
+        #endregion
+      
+        #region 根据用户查询评论
+        [HttpGet]
+        public async Task<MessageModel> GetAllByUserId(int userId, QueryModel queryModel)
+        {
+            var list = await _commentService.GetAllByUserId(userId, queryModel);
+            return new MessageModel()
             {
-
-                throw;
-            }
-            return messageModel;
+                Code = 200,
+                Data = list,
+                Msg = list == null ? "暂无数据" : "获取成功"
+            };
         }
         #endregion
-
+     
         #region 删除评论
         [HttpDelete]
         public async Task<MessageModel> Del(int commentId)
         {
-            MessageModel messageModel = new MessageModel();
-            if (commentId > 0)
+            var isDel = await _commentService.Del(commentId);
+            return new MessageModel()
             {
-                if (await _commentService.DelAllComment(commentId))
-                {
-                    messageModel.Msg = "删除成功";
-                }
-                messageModel.Msg = "删除失败";
-            }
-            messageModel.Msg = "评论不存在";
-            messageModel.Code = 200;
-            return messageModel;
+                Code = 200,
+                Data = isDel,
+                Msg = isDel ? "删除成功" : "删除失败"
+            };
         }
         #endregion
 
-        [HttpGet]
-        public async Task<MessageModel> GetAllByUserId(int userId, QueryModel queryModel)
-        {
-            MessageModel messageModel = new MessageModel();
-            try
-            {
 
-                messageModel.Data = await _commentService.GetAllByUserId(userId, queryModel);
-                messageModel.Code = 200;
-                messageModel.Msg = "success";
-            }
-
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return messageModel;
-        }
     }
 }

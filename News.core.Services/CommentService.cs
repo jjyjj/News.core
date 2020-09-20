@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using News.core.Model.Entities;
 
 namespace News.core.Services
 {
@@ -30,27 +31,32 @@ namespace News.core.Services
             base.BaseDal = commentRepostory;
         }
 
-        public async Task<bool> DelAllComment(int commentId)
+        public async Task<int> Add(Comments comments)
         {
-            var commentChildList = await _commentChildRepository.Query(m => m.CommentsId == commentId);
 
-            if (commentChildList != null)
+            if (comments.UserId > 0 && comments.NewsId > 0) return await _commentRepostory.Create(comments);
+
+            return -1;
+
+
+        }
+
+        public async Task<bool> Del(int commentId)
+        {
+            var list = await _commentChildRepository.Query(m => m.CommentsId == commentId);
+            if (list != null)
             {
-                foreach (var item in commentChildList)
+                foreach (var item in list)
                 {
                     await _commentChildRepository.Delete(item);
                 }
             }
-
-            return await _commentRepostory.Delete(new Model.Entities.Comments() { Id = commentId });
+            return await _commentRepostory.Delete(new Comments() { Id = commentId });
         }
 
         public async Task<PageModel<Model.ViewModel.CommentViewModel>> GetAll(int newsId, QueryModel queryModel)
         {
-
-
             var news = await _newsRepository.GetOneById(newsId);
-
             List<Model.ViewModel.CommentViewModel> commentViewModels = new List<Model.ViewModel.CommentViewModel>();
             PageModel<Model.ViewModel.CommentViewModel> pageModel = new Model.PageModel<Model.ViewModel.CommentViewModel>();
             if (news != null)
