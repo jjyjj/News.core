@@ -34,12 +34,12 @@ namespace News.core.Controllers
         [HttpPost]
         public async Task<MessageModel> Add(string categoryName, int userId)
         {
-            var addId = await _categoryService.Add(categoryName, userId);
+            var id = await _categoryService.Add(categoryName, userId);
             return new MessageModel()
             {
                 Code = 200,
-                Data = addId,
-                Msg = addId > 0 ? "创建成功" : "创建失败"
+                Data = id,
+                Msg = id > 0 ? "创建成功" : "创建失败"
             };
         }
         #endregion

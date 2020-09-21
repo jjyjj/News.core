@@ -4,6 +4,7 @@ using News.core.IServices;
 using News.core.Model;
 using News.core.Model.Entities;
 using News.core.Model.ViewModel;
+using News.core.Model.ViewModel.update;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,43 +34,106 @@ namespace News.core.Services
             base.BaseDal = newsRepository;
         }
 
-        public async Task<bool> delNew(int newsId)
+        public async Task<int> Add(AddArticleModel newsViewModel, int state)
         {
-            var newsData = await _newsRepository.GetOneById(newsId);
-            if (newsData == null) return false;
+
+            Model.Entities.News news = new Model.Entities.News();
+
+            news.Title = newsViewModel.Title;
+            news.UserId = newsViewModel.UserId;
+            news.Content = newsViewModel.Content;
+            news.State = state;
+            news.ImagePath = newsViewModel.ImagePath;
+
+
+            var newsId = await _newsRepository.Create(news);
+
+            if (newsId < 0) return -1;
             else
             {
                 try
                 {
-                    //先去删除newsTocategoryList关联表
-                    var newsTocategoryList = (await _newsToCategoryRepository.GetAll()).FindAll(s => s.NewsId == newsId);
-                    foreach (var item in newsTocategoryList)
+                    foreach (var item in newsViewModel.categories)
                     {
-                        await _newsToCategoryRepository.Delete(item);
+                        NewsToCategory newsToCategory = new NewsToCategory();
+                        newsToCategory.CategoryId = item;
+                        newsToCategory.NewsId = newsId;
+                        await _newsToCategoryRepository.Create(newsToCategory);
                     }
-                    //先删除子评论表
-                    var _commentChildList = await _commentChildRepository.Query(m => m.NewsId == newsId);
-                    foreach (var item in _commentChildList)
-                    {
-                        await _commentChildRepository.Delete(item);
-                    }
-                    //在删除评论表
-                    var commentsList = await _commentRepostory.Query(m => m.NewsId == newsId);
-                    foreach (var item in commentsList)
-                    {
-                        await _commentRepostory.Delete(item);
-                    }
-                    //在删除文章表
-                    await _newsRepository.Delete(newsData);
-                    return true;
+                    return newsId;
                 }
                 catch (Exception)
                 {
-
-                    throw;
+                    var data = await _newsRepository.GetOneById(newsId);
+                    await _newsRepository.Delete(data);
+                    return -1;
                 }
+            }
+
+
+
+        }
+
+        public async Task<bool> Del(int newsId)
+        {
+            var newsData = await _newsRepository.GetOneByStr(m => m.Id == newsId);
+            if (newsData == null) return false;
+            else
+            {
+                //先去删除newsTocategoryList关联表
+                var newsTocategoryList = await _newsToCategoryRepository.Query(m => m.NewsId == newsId);
+
+                foreach (var item in newsTocategoryList)
+                {
+                    await _newsToCategoryRepository.Delete(item);
+                }
+                //先删除子评论表
+                var _commentChildList = await _commentChildRepository.Query(m => m.NewsId == newsId);
+                foreach (var item in _commentChildList)
+                {
+                    await _commentChildRepository.Delete(item);
+                }
+                //在删除评论表
+                var commentsList = await _commentRepostory.Query(m => m.NewsId == newsId);
+                foreach (var item in commentsList)
+                {
+                    await _commentRepostory.Delete(item);
+                }
+                //在删除文章表
+                return await _newsRepository.Delete(newsData);
+
+
 
             }
+
+        }
+
+        public async Task<dynamic> GetAll(QueryModel queryModel, int? state)
+        {
+
+            if (!queryModel.isPage) return await _newsRepository.Query(m => m.State == 0);
+            else
+            {
+                Model.PageModel<Model.Entities.News> newsList = new Model.PageModel<Model.Entities.News>();
+
+                if (state == null)
+                {
+                    newsList = await _newsRepository.Pagination<Model.Entities.News, object>(queryModel.pageIndex, queryModel.pageSize, n => n.CreateTime, null, queryModel.isDesc);
+
+                }
+                else
+                {
+                    newsList = await _newsRepository.Pagination<Model.Entities.News, object>(queryModel.pageIndex, queryModel.pageSize, n => n.CreateTime, x => x.State == state, queryModel.isDesc);
+
+                }
+                foreach (var item in newsList.data)
+                {
+                    item.User = await _userRepository.GetOneById(item.UserId.Value);
+                }
+                return newsList;
+            }
+
+
 
         }
 
@@ -236,5 +300,40 @@ namespace News.core.Services
             return pageModel;
         }
 
+        public async Task<bool> Update(updateNews updateNews)
+        {
+            var newsData = await _newsRepository.GetOneById(updateNews.news.Id);
+            if (newsData != null)
+            {
+                newsData.Content = updateNews.news.Content;
+                newsData.Title = updateNews.news.Title;
+                newsData.ImagePath = updateNews.news.ImagePath;
+                newsData.LastChangTime = DateTime.Now;
+                newsData.UserId = updateNews.news.UserId;
+                newsData.State = updateNews.news.State;
+                newsData.IsRemove = updateNews.news.IsRemove;
+                newsData.ImagePath = updateNews.news.ImagePath;
+                if (await _newsRepository.Update(newsData))
+                {
+                    //因为这里的记录没有保留价值，所以在此处直接删除后添加即可。
+                    var oldNewsToCategoryList = await _newsToCategoryRepository.Query(m => m.NewsId == updateNews.news.Id);
+                    for (int i = 0; i < oldNewsToCategoryList.Count; i++)
+                    {
+                        await _newsToCategoryRepository.Delete(oldNewsToCategoryList[i]);
+                    }
+                    for (int j = 0; j < updateNews.cateId.Count; j++)
+                    {
+                        await _newsToCategoryRepository.Create(new NewsToCategory()
+                        {
+                            NewsId = updateNews.news.Id,
+                            CategoryId = updateNews.cateId[j],
+                        });
+                    }
+                    return true;
+                }
+
+            }
+            return false;
+        }
     }
 }

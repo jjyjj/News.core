@@ -21,7 +21,7 @@ namespace News.core.Controllers
     {
         private readonly IFocusService _focusService;
 
-        public FocusController(IFocusService focusService, IUserService userService)
+        public FocusController(IFocusService focusService)
         {
             _focusService = focusService ?? throw new ArgumentNullException(nameof(focusService));
         }

@@ -1,5 +1,6 @@
 ﻿using News.core.IRepository;
 using News.core.IServices;
+using News.core.Model;
 using News.core.Model.Entities;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,6 @@ namespace News.core.Services
             _imgsRepository = imgsRepository ?? throw new ArgumentNullException(nameof(imgsRepository));
         }
 
-
+      
     }
 }

@@ -27,9 +27,9 @@ namespace News.core.Repository
             _dbSet.Add(model);
 
             //  _db.Entry<T>(model).State = EntityState.Added;
-            return await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-
+            return model.Id;
 
         }
 
@@ -85,8 +85,6 @@ namespace News.core.Repository
 
         public async Task<bool> Update(T model)
         {
-            //_db.Attach(model);
-            //_db.Entry(model).State = EntityState.Modified;
             _dbSet.Update(model);
             return await _db.SaveChangesAsync() > 0;
         }

@@ -50,10 +50,8 @@ namespace News.core.Services
             //查是否有文章引用该类别
             var newsToCategory = await _newsToCategoryRepository.
                 GetOneByStr(m => m.CategoryId == CategoryId);
-            if (newsToCategory != null)
-            {
-                isDel = await _categoryRepostorycs.Delete(cate);
-            }
+            if (newsToCategory == null) isDel = await _categoryRepostorycs.Delete(cate);
+
 
             return isDel;
 

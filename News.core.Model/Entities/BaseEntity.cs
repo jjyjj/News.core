@@ -16,7 +16,7 @@ namespace News.core.Model.Entities
         /// News: 0正常 1草稿箱 2垃圾箱
         /// Users:0正常 1 冻结
         /// Comments：0正常 1屏蔽
-        /// Imgs: 1轮播图片
+        /// Imgs: 0相片 1轮播图片 2新闻图片(未实现) 3头像(未实现) 4类别图片(未实现) 
         /// </summary>
         public int? State { get; set; } = 0;
         /// <summary>

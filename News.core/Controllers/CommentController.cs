@@ -14,10 +14,10 @@ namespace News.core.Controllers
     {
         private readonly ICommentService _commentService;
 
-        public CommentController(ICommentService commentService, INewsService newsService, IUserService userService, ICommentChildService commentChildService)
+        public CommentController(ICommentService commentService)
         {
             _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
-            
+
         }
         #region 添加评论
         [HttpPost]
@@ -52,7 +52,7 @@ namespace News.core.Controllers
 
 
         #endregion
-      
+
         #region 根据用户查询评论
         [HttpGet]
         public async Task<MessageModel> GetAllByUserId(int userId, QueryModel queryModel)
@@ -66,7 +66,7 @@ namespace News.core.Controllers
             };
         }
         #endregion
-     
+
         #region 删除评论
         [HttpDelete]
         public async Task<MessageModel> Del(int commentId)

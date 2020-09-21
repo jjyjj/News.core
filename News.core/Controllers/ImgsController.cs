@@ -71,7 +71,7 @@ namespace News.core.Controllers
         public async Task<Model.MessageModel> GetAllByUserId(int userId, int lunBoListLength, QueryModel queryModel)
         {
             //分页可选，状态可选
-            #region news ways
+            #region 
             MessageModel messageModel = new MessageModel();
             var list = await _imgsService.Query(m => m.UserId == userId);
             if (!queryModel.isPage)
@@ -93,38 +93,9 @@ namespace News.core.Controllers
             {
                 messageModel.Data = list.FindAll(s => s.State == 1).Take(lunBoListLength);
             }
-
-
             #endregion
-
-
             messageModel.Code = 200;
             return messageModel;
-
-
-
-            //if (!queryModel.isPage)
-            //{
-            //    return new MessageModel() { Code = 200, Data = await _imgsService.Query(m => m.UserId == userId), Msg = "获取成功" };
-            //}
-            //else
-            //{
-            //    return new MessageModel()
-            //    {
-            //        Code = 200,
-            //        Data = await _imgsService.Pagination<Imgs, object>(
-            //            queryModel.pageIndex,
-            //            queryModel.pageSize,
-            //            n => n.CreateTime,
-            //            n => n.UserId == userId,
-            //            queryModel.isDesc
-            //            ),
-            //        Msg = "获取成功"
-            //    };
-
-            //}
-
-
         }
 
         [HttpPost]
