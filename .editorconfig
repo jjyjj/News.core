@@ -2,3 +2,6 @@
 
 # IDE0060: 删除未使用的参数
 dotnet_code_quality_unused_parameters = all:none
+
+# CS1717: 对同一变量进行了赋值
+dotnet_diagnostic.CS1717.severity = none

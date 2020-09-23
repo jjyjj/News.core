@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\News.core.IRepository\News.core.IRepository.csproj" />
     <ProjectReference Include="..\News.core.IServices\News.core.IServices.csproj" />
     <ProjectReference Include="..\News.core.Model\News.core.Model.csproj" />

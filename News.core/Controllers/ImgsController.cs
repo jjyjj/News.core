@@ -15,190 +15,97 @@ namespace News.core.Controllers
     public class ImgsController : BaseController
     {
         private readonly IImgsService _imgsService;
-        private readonly IUserService _userService;
 
-        [Obsolete]
-        private readonly IHostingEnvironment hostingEnv;
 
-        string[] pictureFormatArray = { "png", "jpg", "jpeg", "bmp", "gif", "ico", "PNG", "JPG", "JPEG", "BMP", "GIF", "ICO" };
-
-        [Obsolete]
-        public ImgsController(IImgsService imgsService, IUserService userService, IHostingEnvironment env)
+        public ImgsController(IImgsService imgsService)
         {
             _imgsService = imgsService ?? throw new ArgumentNullException(nameof(imgsService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService)); this.hostingEnv = env;
+
         }
 
 
 
         [HttpGet]
-        public async Task<MessageModel> GetAll(QueryModel queryModel, int state)
+        public async Task<MessageModel> GetAll(QueryModel queryModel)
         {
-            MessageModel messageModel = new MessageModel();
-            try
+            var list = await _imgsService.GetAll(queryModel);
+            return new MessageModel()
             {
-                if (!queryModel.isPage) messageModel.Data = await _imgsService.Query(m => m.State == 0);
-                else
-                {
-                    var imgsList = await _imgsService.Pagination<Model.Entities.Imgs, object>(queryModel.pageIndex, queryModel.pageSize, n => n.CreateTime, x => x.State == state, queryModel.isDesc);
-                    foreach (var item in imgsList.data)
-                    {
-                        item.User = await _userService.GetOneById(item.UserId);
-                    }
-                    messageModel.Data = imgsList;
-                }
-                messageModel.Code = 200;
-                messageModel.Msg = "获取数据成功";
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            return messageModel;
-
+                Code = 200,
+                Data = list,
+                Msg = list == null ? "暂无数据" : "获取成功"
+            };
 
         }
         [HttpGet]
-
         public async Task<Model.MessageModel> GetOneById(int id)
         {
 
             return new MessageModel() { Code = 200, Data = await _imgsService.GetOneById(id), Msg = "获取成功" };
         }
         [HttpGet]
-
-        public async Task<Model.MessageModel> GetAllByUserId(int userId, int lunBoListLength, QueryModel queryModel)
+        public async Task<Model.MessageModel> GetAllByUserId(int userId, int? state, int? carouselLength, QueryModel queryModel)
         {
-            //分页可选，状态可选
-            #region 
+
+            List<Imgs> imgsList = await _imgsService.Query(m => m.UserId == userId);
             MessageModel messageModel = new MessageModel();
-            var list = await _imgsService.Query(m => m.UserId == userId);
-            if (!queryModel.isPage)
+            PageModel<Model.Entities.Imgs> pageModel = new PageModel<Model.Entities.Imgs>();
+            //我的相册
+            if (state == null)
             {
-                messageModel.Data = list;
+                pageModel.data = imgsList;
+                if (queryModel.isPage)
+                {
+                    pageModel = await _imgsService.Pagination<Imgs, object>(queryModel.pageIndex, queryModel.pageSize, m => m.CreateTime, n => n.UserId == userId, true);
+                }
             }
+            //我的头像
             else
             {
-                messageModel.Data = await _imgsService.Pagination<Imgs, object>(
-                       queryModel.pageIndex,
-                       queryModel.pageSize,
-                       n => n.CreateTime,
-                       n => n.UserId == userId,
-                       queryModel.isDesc
-                       );
+                //我的轮播
+                if (carouselLength != null)
+                {
+                    pageModel.data = imgsList.FindAll(m => m.State == state).Take(carouselLength.Value).ToList();
+                }
+                else { pageModel = await _imgsService.Pagination<Imgs, object>(queryModel.pageIndex, queryModel.pageSize, m => m.CreateTime, m => m.State == state, true); }
+
             }
-            //如果是查轮播图片，则取出5条记录
-            if (lunBoListLength > 0)
-            {
-                messageModel.Data = list.FindAll(s => s.State == 1).Take(lunBoListLength);
-            }
-            #endregion
             messageModel.Code = 200;
+            messageModel.Data = pageModel;
             return messageModel;
+
+
+
         }
 
         [HttpPost]
-        [Obsolete]
-        public async Task<MessageModel> Add(int userId)
+
+        public async Task<MessageModel> Add(int userId, int state)
         {
-            MessageModel messageModel = new MessageModel();
-            List<string> filePathResultList = new List<string>();
-            try
+            //0相片 1轮播图片 2新闻图片(未实现) 3头像(未实现) 4类别图片(未实现)
+            var files = Request.Form.Files;
+            var fileModel = await _imgsService.Add(files, userId, state);
+            return new MessageModel()
             {
-                #region 数据处理
-                string type = $@"LunBo/{userId}";
-                var files = Request.Form.Files;
-                long size = files.Sum(f => f.Length);
+                Code = 200,
+                Data = fileModel,
+                Msg = fileModel.id > 0 ? "创建成功" : "创建失败"
+            };
 
-                //size > 100MB refuse upload !
-                if (size > 104857600)
-                {
-                    messageModel.Msg = "pictures total size > 100MB , server refused !";
-                    return messageModel;
-
-                }
-
-
-                foreach (var file in files)
-                {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-
-                    string filePath = hostingEnv.WebRootPath;
-                    filePath = filePath + $@"\Files\Pictures\{type}\";
-
-
-                    string suffix = fileName.Split('.')[1];
-                    if (!pictureFormatArray.Contains(suffix))
-                    {
-                        messageModel.Msg = "the picture format not support ! you must upload files that suffix like 'png','jpg','jpeg','bmp','gif','ico'.";
-                        return messageModel;
-                    }
-                    string date = DateTime.Now.ToString("yyyy-MM-dd");
-                    fileName = date + "-" + Guid.NewGuid() + "." + suffix;
-                    string fileFullName = filePath + fileName;
-                    filePathResultList.Add($"/Files/Pictures/{type}/{fileName}");
-                    #endregion
-
-                    //写入数据库filePathResultList
-                    Imgs imgs = new Imgs();
-                    imgs.Url = filePathResultList[0];
-                    imgs.UserId = userId;
-                    var createId = await _imgsService.Create(imgs);
-
-                    try
-                    {
-                        if (!Directory.Exists(filePath))
-                        {
-                            Directory.CreateDirectory(filePath);
-                        }
-                        using (FileStream fs = System.IO.File.Create(fileFullName))
-                        {
-                            file.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        _imgsService.RollBack();
-                    }
-
-
-                }
-                string message = $"{files.Count} file(s) /{size} bytes uploaded successfully!";
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-            messageModel.Data = filePathResultList;
-            return messageModel;
         }
 
 
         [HttpDelete]
-        [Obsolete]
+
         public async Task<MessageModel> Del(int id)
         {
-            var img = await _imgsService.GetOneById(id);
-            string filePath = img.Url;
-            await _imgsService.Delete(img);
-            try
+            var isDel = await _imgsService.Del(id);
+            return new MessageModel()
             {
-                string path = hostingEnv.WebRootPath + $@"\";
-                if (System.IO.Directory.Exists(path))
-                {
-                    System.IO.File.Delete(path + filePath);//删除某个指定的文件
-                }
-            }
-            catch (Exception)
-            {
-
-                _imgsService.RollBack();
-            }
-            return new MessageModel() { Code = 200, Data = null, Msg = "删除成功" };
+                Code = 200,
+                Data = isDel,
+                Msg = isDel ? "删除成功" : "删除失败"
+            };
 
         }
 

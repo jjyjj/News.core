@@ -22,11 +22,13 @@ namespace News.core.Controllers
     {
         private readonly IUserService _userService;
         private readonly ICaptcha _captcha;
+        private readonly IImgsService _imgsService;
 
-        public UserController(IUserService userService, ICaptcha captcha)
+        public UserController(IUserService userService, ICaptcha captcha,IImgsService imgsService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _captcha = captcha ?? throw new ArgumentNullException(nameof(captcha));
+            _imgsService = imgsService ?? throw new ArgumentNullException(nameof(imgsService));
         }
 
         #region 获取所有用户信息
