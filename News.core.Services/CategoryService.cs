@@ -24,6 +24,24 @@ namespace News.core.Services
             _newsToCategoryRepository = newsToCategoryRepository ?? throw new ArgumentNullException(nameof(newsToCategoryRepository));
             base.BaseDal = categoryRepostorycs;
         }
+        public async Task<List<Category>> GetAllCateUsers()
+        {
+            var cateList = await _categoryRepostorycs.GetAll();
+            var userList = await _userRepository.GetAll();
+          
+            foreach (var cate in cateList)
+            {
+                foreach (var user in userList)
+                {
+                    if (cate.UserId == user.Id)
+                    {
+                        cate.User = user;
+                    }
+                }
+            }
+            return cateList;
+        }
+
 
         public async Task<int> Add(string categoryName, int userId)
         {

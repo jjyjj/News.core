@@ -24,7 +24,7 @@ namespace News.core.Controllers
             return new MessageModel()
             {
                 Code = 200,
-                Data = await _categoryService.GetAll(),
+                Data = await _categoryService.GetAllCateUsers(),
                 Msg = "请求成功"
             };
         }
