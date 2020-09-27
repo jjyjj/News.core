@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using News.core.Common;
+
 using News.core.IServices;
 using News.core.Model;
 using News.core.Model.Entities;

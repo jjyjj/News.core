@@ -23,7 +23,8 @@ namespace News.core.Model.Entities
 
         public virtual DbSet<NewsToCategory> NewsToCategory { get; set; }
         public virtual DbSet<Imgs> Imgs { get; set; }
-
+        public virtual DbSet<TestUser>  TestUsers { get; set; }
+        public virtual DbSet<TestGoods>  TestGoods { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

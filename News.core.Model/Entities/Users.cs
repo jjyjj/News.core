@@ -12,7 +12,7 @@ namespace News.core.Model.Entities
         public string PassWord { get; set; }
 
         public string Phone { get; set; }
-        public string Name { get; set; } = "写手" + getRandomDom(4) + "";
+        public string Name { get; set; } =  getRandomDom(4) + "";
         public string Adress { get; set; }
         public string Birthday { get; set; }//2020-02-02
         public string Sex { get; set; }//0男  1女
